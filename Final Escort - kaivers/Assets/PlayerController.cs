@@ -38,14 +38,21 @@ public class PlayerController : MonoBehaviour
     }
 
     void Look(){
-        var relative = (trans.position + input) - trans.position; // don't get why this is like that, why isnt it just input ?
-        //var relative = input;
-        var rot = Quaternion.LookRotation(relative, Vector3.up); //look into the inputted direction but rotate the character toward it, vector3.up defines up direction, all is relative to that?
-        transform.rotation = Quaternion.RotateTowards(trans.rotation, rot, turnSpeed * Time.deltaTime); //instead of setting trans.rot = rot, we can lerp it 
+        if (input != Vector3.zero){
+
+            var matrix = Matrix4x4.Rotate(Quaternion.Euler(0,45,0));
+            var skewedInput = matrix.MultiplyPoint3x4(input);
+            
+            var relative = (trans.position + input) - trans.position; // don't get why this is like that, why isnt it just var relative = input; ?
+            var rot = Quaternion.LookRotation(relative, Vector3.up); //look into the inputted direction but rotate the character toward it, vector3.up defines up direction, all is relative to that?
+            transform.rotation = Quaternion.RotateTowards(trans.rotation, rot, turnSpeed * Time.deltaTime); //instead of setting trans.rot = rot, we can lerp it to make it smoother 
+        }
+
     }
 
     void Move(){
-        rb.MovePosition(trans.position + trans.forward * input.magnitude * speed * Time.deltaTime); //tranform.forward takes into account the rotation of the obj. as opposed to new vector3.forward
+        rb.MovePosition(trans.position + (trans.forward * input.magnitude) * speed * Time.deltaTime); //tranform.forward takes into account the rotation of the obj. as opposed to new vector3.forward
+
     }
 
 }
